@@ -381,4 +381,4 @@ from the training dataset.
 Full code available here:
 [`training_model_for_chatbot.ipynb`](./ChatBot/training_model_for_chatbot.ipynb)
 and here:
-[`use_trained_model.ipynb`](./use_trained_model.ipynb)
+[`use_trained_model.ipynb`](./ChatBot/use_trained_model.ipynb)
