@@ -262,3 +262,71 @@ which confirms that fine-tuning even on a small balanced dataset can yield decen
 
 You can find all the code related to this step here:
 [`Use_Trained_Model.ipynb`](./CustomerFeedbackAnalysis/Use_Trained_Model.ipynb)
+
+
+## Semantic Product Recommendation
+
+### Dataset
+
+The dataset used is the **Flipkart Ecommerce Dataset** sourced from Kaggle.
+It contains product information such as: names, descriptions, specifications, prices and ratings.
+
+Dataset link: [Flipkart Ecommerce Dataset](https://www.kaggle.com/datasets/atharvjairath/flipkart-ecommerce-dataset)
+
+---
+
+### Goal
+
+Traditional search systems match products based on **keywords only**.
+The goal of this project is to go further by understanding the **semantic meaning** behind a user query
+and returning the most relevant products even if the exact keywords are not present.
+
+---
+
+### Approach : Semantic Embeddings with SentenceTransformers
+
+To achieve semantic search, we used the **SentenceTransformer** embedding model
+[`all-mpnet-base-v2`](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)
+to convert text into vector representations (embeddings).
+
+Each product was embedded by combining three key textual fields:
+`product name`, `description` and `specifications` into a single text,
+then encoded into a semantic vector.
+
+---
+
+### Recommendation Function
+
+A function was defined to retrieve the **top N most relevant products** for a given user query.
+It works by encoding the user input into a vector, then computing the **cosine similarity**
+between that vector and all product embeddings, and finally returning the most similar products:
+
+```python
+def get_products(user_input, products_dataframe, embeddings,
+                 embedding_model=model, recommendation_num=10):
+
+    user_input = re.sub(r"[^a-zA-z0-9]", " ", user_input)
+    user_embedding_vector = embedding_model.encode([user_input])
+    similarities = cosine_similarity(user_embedding_vector, embeddings)
+    similarities = similarities[0]
+    sorted_indices_desc = similarities.argsort()[::-1]
+    recommended_products_indexes = sorted_indices_desc[0:recommendation_num + 1]
+    recommended_products = products_dataframe.iloc[recommended_products_indexes, [3, 5, 10]]
+    return recommended_products
+```
+
+---
+
+### Result
+
+After testing with a natural language query such as:
+`"Looking for a budget smartphone under 15000 with good camera"`,
+the system successfully returns the 10 most relevant products based on semantic similarity,
+going beyond simple keyword matching.
+
+---
+
+Full code available here:
+[`product_recommendation.ipynb`](./ProductRecommendations/product_recommendation.ipynb)
+and here:
+[`semantic_product_recommendation.ipynb`](./ProductRecommendations/semantic_product_recommendation.ipynb)
