@@ -220,3 +220,45 @@ with a training loss of **0.347**.
 You can find all the notebook code related to: splitting raw data between train and test, preparing the dataset in the correct format, training the model and saving it here:
 
 [`training_model.ipynb`](./CustomerFeedbackAnalysis/training_model.ipynb)
+
+### Step 3 : Evaluation and Comparison
+
+Once the model is trained and saved, we reload it and evaluate its accuracy on the test set.
+A custom function was defined to compute the accuracy of any given model:
+
+```python
+def get_model_accuracy(model, tokenizer, dframe):
+    df = dframe.copy()
+    df["predicted_class"] = 0
+    for index, row in df.iterrows():
+        sentiment = row["reviews.text"]
+        tokenized_sentiment = tokenizer(
+            sentiment,
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=512
+        )
+        output = model(**tokenized_sentiment)
+        logits = output.logits
+        model_prediction_value = torch.argmax(logits, dim=1).item()
+        df.at[index, "predicted_class"] = model_prediction_value
+    correct_predictions = (df["predicted_class"] == df["class"]).sum()
+    accuracy = round((correct_predictions / len(df)) * 100, 2)
+    return accuracy
+```
+
+This function was then used to compare the accuracy of our fine-tuned model
+against the ready-to-use **Twitter RoBERTa** model:
+
+```
+Accuracy of Twitter Sentiment Model : 89.55 %
+Accuracy of Our Trained Model       : 74.25 %
+```
+
+The Twitter model achieves higher accuracy since it was trained on a much larger dataset.
+Our model still performs reasonably well (74.25%) given it was trained on only ~293 samples,
+which confirms that fine-tuning even on a small balanced dataset can yield decent results.
+
+You can find all the code related to this step here:
+[`Use_Trained_Model.ipynb`](./CustomerFeedbackAnalysis/Use_Trained_Model.ipynb)
