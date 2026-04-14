@@ -1,7 +1,7 @@
 # Transformers in E-Commerce
 
 This project explores how **transformer models** can be applied to solve real-world
-e-commerce problems — from understanding customer sentiment to answering store-specific questions.
+e-commerce problems: from understanding customer sentiment to answering store-specific questions.
 
 ---
 
@@ -10,13 +10,13 @@ e-commerce problems — from understanding customer sentiment to answering store
 ### 1.  Customer Feedback Analysis - [`CustomerFeedbackAnalysis`](./CustomerFeedbackAnalysis)
 Fine-tuned a **RoBERTa-base** model to automatically classify customer reviews into
 **positive**, **neutral**, and **negative** sentiments.
-A pretrained out-of-the-box transformer was also tested for comparison purposes.
+A pretrained ready-to-use transformer was also tested for comparison purposes.
 
 ---
 
 ### 2.  Semantic Product Recommendation - [`ProductRecommendations`](./ProductRecommendations)
-Built a recommendation system that goes beyond simple keyword matching —
-it understands the **semantic meaning** behind a user's search query
+Built a recommendation system that goes beyond simple keyword matching.
+It understands the **semantic meaning** behind a user's search query
 to suggest the most relevant products.
 
 ---
@@ -28,8 +28,9 @@ Fine-tuned a transformer to act as a chatbot capable of answering
 ##  Customer Feedback Analysis
 
 ### Overview
-The goal of this task is to automatically classify customer reviews into three sentiment categories:
-**positive**, **neutral**, and **negative**.
+The goal of this task is to fine-tune a **RoBERTa-base** classifier
+to automatically classify customer reviews into three sentiment categories:
+**positive**, **neutral** and **negative**.
 
 The dataset was sourced from **Kaggle** and contains customer reviews
 already labeled with their corresponding sentiment.
@@ -38,7 +39,7 @@ already labeled with their corresponding sentiment.
 
 ### What is RoBERTa?
 **RoBERTa** (Robustly Optimized BERT Approach) is a transformer model developed by Facebook AI.
-It is an improved version of BERT — trained on more data, for longer,
+It is an improved version of BERT, trained on more data, for longer,
 with better training strategies. It has shown strong performance on
 text classification tasks like sentiment analysis.
 
@@ -46,15 +47,15 @@ text classification tasks like sentiment analysis.
 
 ### Approach
 Although HuggingFace already offers a ready-to-use sentiment classifier based on RoBERTa -
-[`twitter-roberta-base-sentiment`](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest) -
+[twitter-roberta-base-sentiment](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest) -
 which can classify text out of the box without any training,
-I chose to fine-tune the base **`roberta-base`** model from scratch on our dataset,
+I chose to fine-tune the base **roberta-base** model from scratch on our dataset,
 for the purpose of learning how the fine-tuning pipeline works end to end.
 
 ---
 
 ### Step 1 - Handling Class Imbalance
-The first issue encountered was that the dataset was **imbalanced** —
+The first issue encountered was that the dataset was **imbalanced**:
 some sentiment classes had significantly more samples than others,
 which can bias the model during training.
 
@@ -330,3 +331,54 @@ Full code available here:
 [`product_recommendation.ipynb`](./ProductRecommendations/product_recommendation.ipynb)
 and here:
 [`semantic_product_recommendation.ipynb`](./ProductRecommendations/semantic_product_recommendation.ipynb)
+
+## EStore Chatbot
+
+### Approach
+
+For this task, we fine-tuned a **GPT-2** model on a custom Q&A dataset
+so it can answer questions specifically related to our estore.
+
+The same training methodology was used (Trainer and TrainingArguments),
+however since GPT-2 is a **Causal Language Model**, the training dataset
+requires a different format compared to the classifier task.
+
+---
+
+### Training Dataset Format
+
+The dataset is a **HuggingFace Dataset** where each row is a dictionary.
+Since GPT-2 learns by predicting the next token from a flat string,
+the question and answer are merged into a single text field:
+
+```python
+{
+    "input_ids":      [15496, 25, 995, 318, ...],
+    "attention_mask": [1, 1, 1, 1, ...]
+}
+```
+
+Each row was formatted as follows before tokenization:
+
+```
+"Question: {question}\nAnswer: {answer}<|endoftext|>"
+```
+
+There are no separate labels here since GPT-2 learns by predicting
+the next token from the input itself (the DataCollator handles that automatically
+with `mlm=False`).
+
+---
+
+### Result
+
+After training, the model was able to answer questions related to the estore,
+responding with coherent and relevant answers based on what it learned
+from the training dataset.
+
+---
+
+Full code available here:
+[`training_model_for_chatbot.ipynb`](./ChatBot/training_model_for_chatbot.ipynb)
+and here:
+[`use_trained_model.ipynb`](./use_trained_model.ipynb)
