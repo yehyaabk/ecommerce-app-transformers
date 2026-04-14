@@ -1,4 +1,5 @@
 # Transformers in E-Commerce
+> Project by **ABOU KHECHFE Yehya**
 
 This project explores how **transformer models** can be applied to solve real-world
 e-commerce problems: from understanding customer sentiment to answering store-specific questions.
