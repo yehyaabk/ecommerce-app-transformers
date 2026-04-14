@@ -217,3 +217,6 @@ with a training loss of **0.347**.
 
 ![Training Output](./CustomerFeedbackAnalysis/images/training_output.png)
 
+You can find all the notebook code related to: splitting raw data between train and test, preparing the dataset in the correct format, training the model and saving it here:
+
+[`training_model.ipynb`](./CustomerFeedbackAnalysis/training_model.ipynb)
