@@ -11,3 +11,5 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+/content/drive/MyDrive/transformers/Ecommerce/ChatBot/checkpoint-255/
+/content/drive/MyDrive/transformers/Ecommerce/ChatBot/model_dir/
